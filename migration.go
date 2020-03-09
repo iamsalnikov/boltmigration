@@ -31,7 +31,7 @@ func (mr migrationRecord) key() []byte {
 	return []byte(mr.Name)
 }
 
-const migrationsTable = "migrations"
+const migrationsBucket = "migrations"
 
 var defaultAppliedFunc = AppliedFunc(func(db *bbolt.DB) ([]string, error) {
 	createMigrationsBucket(db)
@@ -39,7 +39,7 @@ var defaultAppliedFunc = AppliedFunc(func(db *bbolt.DB) ([]string, error) {
 	applied := make([]string, 0)
 
 	err := db.View(func(tx *bbolt.Tx) error {
-		bucket := tx.Bucket([]byte(migrationsTable))
+		bucket := tx.Bucket([]byte(migrationsBucket))
 
 		return bucket.ForEach(func(k, v []byte) error {
 			mig := &migrationRecord{}
@@ -65,7 +65,7 @@ var defaultMarkAppliedFunc = MarkAppliedFunc(func(db *bbolt.DB, name string) err
 	}
 
 	return db.Update(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(migrationsTable))
+		b := tx.Bucket([]byte(migrationsBucket))
 
 		data, err := json.Marshal(&mr)
 		if err != nil {
@@ -95,7 +95,7 @@ func resetMarkAppliedFunc() {
 
 func createMigrationsBucket(db *bbolt.DB) error {
 	return db.Update(func(tx *bbolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(migrationsTable))
+		_, err := tx.CreateBucketIfNotExists([]byte(migrationsBucket))
 		return err
 	})
 }
