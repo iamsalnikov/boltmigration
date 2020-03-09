@@ -1,4 +1,4 @@
-package migration
+package boltmigration
 
 import (
 	"errors"
